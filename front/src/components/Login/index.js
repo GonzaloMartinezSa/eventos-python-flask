@@ -58,13 +58,13 @@ export default function Login(props) {
       // })
       // });
 
-      const response = await fetch(`http://localhost:5000/auth/login`, {
+      const response = await fetch(`http://localhost:5000/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        'username': data.username,
+        'username': data.email,
         'password': data.password
       })
       });
@@ -74,9 +74,8 @@ export default function Login(props) {
 
       if(response.status === 200) {
 
-        props.setToken(responseData.token)
-        //localStorage.setItem('user_id', responseData.user_id)
-        localStorage.setItem('user_id', responseData.token)
+        props.setToken(responseData.access_token)
+        localStorage.setItem('user_id', responseData.user_id)
         
         // login successful!     
         // redirect to '/'   
@@ -94,10 +93,10 @@ export default function Login(props) {
         // console.log(test_data)
       }
 
-      if(response.status === 400) {
+      if(response.status === 401) {
         setLoginError(true);
         // login failed! Incorrect username or password.
-        console.log(responseData.non_field_errors[0])
+        
       }
       else{
         document.cookie = `session=${data.session}; path=/`;
@@ -129,7 +128,7 @@ export default function Login(props) {
         <Stack spacing={3}>
           {!!errors.afterSubmit && <Alert severity="error">{errors.afterSubmit.message}</Alert>}
 
-          <RHFTextField name="username" label="Username" />
+          <RHFTextField name="email" label="Email address" />
 
           <RHFTextField
             name="password"

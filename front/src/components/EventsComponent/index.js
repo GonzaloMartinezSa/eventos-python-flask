@@ -14,11 +14,11 @@ const Events = (props) => {
     console.log(props.token)
 
     try {
-      const response = await fetch('http://localhost:5000/events/', {
+      const response = await fetch('http://localhost:5000/events', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Token ' + props.token
+          'Authorization': 'Bearer ' + props.token
         },
       });
 

@@ -1,6 +1,0 @@
-Django
-django-elasticsearch-dsl-drf
-django-elasticsearch-dsl
-djangorestframework
-django-cors-headers
-drf_yasg

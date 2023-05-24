@@ -48,16 +48,15 @@ export default function Register() {
   const onSubmit = async (data) => {
     try {
 
-      console.log(data.username, data.email, data.password);
+      console.log(data.email, data.password);
 
-      const response = await fetch(`http://localhost:5000/auth/signup`, {
+      const response = await fetch(`http://localhost:5000/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          'username': data.username,
-          'email': data.email,
+          'username': data.email,
           'password': data.password
         })
       });
@@ -91,8 +90,6 @@ export default function Register() {
             <RHFTextField name="firstName" label="First name" />
             <RHFTextField name="lastName" label="Last name" />
           </Stack> */}
-
-          <RHFTextField name="username" label="Username" />
 
           <RHFTextField name="email" label="Email address" />
 
