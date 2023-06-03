@@ -10,7 +10,7 @@ templates/unused
 local_settings.py
 static/
 .DS_Store
-*.sqlite3
+# *.sqlite3
 _versions
 uploads/
 basestatic/config.codekit

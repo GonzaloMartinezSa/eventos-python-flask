@@ -36,8 +36,8 @@ function App() {
               {/* TODO: Cambiar el index para que pueda mandarte a las otras pantallas */}
               <Route index element={<Events token={token} setToken={setToken}/>} />
               {/* <Route path="/register" element={<Register />} /> */}
-              {/* <Route path="/login" element={<Login />} /> */}
-              <Route path="/logout" element={<Logout token={removeToken}/>} />
+              { <Route path="/login" element={<Login setToken={setToken} />} /> }
+              <Route path="/logout" element={<Logout token={token} removeToken={removeToken}/>} />
               <Route path="/events" element={<Events token={token} setToken={setToken}/>} />
               <Route path="/events/create" element={<CreateForm token={token} setToken={setToken}/>} />
               <Route path="/events/:id" element={<EventDetail token={token} setToken={setToken} />} />

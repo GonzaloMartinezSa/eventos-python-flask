@@ -50,13 +50,14 @@ export default function Register() {
 
       console.log(data.email, data.password);
 
-      const response = await fetch(`http://localhost:5000/signup`, {
+      const response = await fetch(`http://localhost:5000/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
           'username': data.email,
+          'email': data.email,
           'password': data.password
         })
       });

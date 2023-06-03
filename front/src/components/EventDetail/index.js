@@ -49,7 +49,7 @@ const EventDetail = (props) => {
   }, [])
 
   const handleCloseVoting = async () => {
-    if(localStorage.getItem('user_id') != event.creator_id) {
+    if(localStorage.getItem('user_id') != event.creator.id) {
       setMessage('No sos el creador del evento, no podés cerrarlo');
       return;
     }
@@ -64,6 +64,7 @@ const EventDetail = (props) => {
       const data = await response.json();
       if(response.status === 200) {
         data.access_token && props.setToken(data.access_token)
+        window.location.reload()
       }
       response.status===200 
         ? setMessage('Votacion cerrada correctamente') 
@@ -75,35 +76,36 @@ const EventDetail = (props) => {
     }
   }
 
-  const handleRedirect = () => {
-    window.location.href = `/events/${id}/options`
-  }
-
   return (
     <AppContainer>
       <Card sx={{ maxWidth: 345, ml:20, minWidth: 200}}>
-      <CardContent>
-        <h1>Evento</h1>
-        <h2>ID: {event.id}</h2>
-        <h2>Nombre: {event.name}</h2>
-        <h2>Disponible: {event.available ? "Sí" : "No"}</h2>
-        <h2>Fecha de Creacion: {event.created_at}</h2>
-        <h2>Fecha del Evento: {event.final_date || "Todavia no se decidio una fecha"}</h2>
-      </CardContent>
-      {/* <Container>
-        <button onClick={handleRedirect}>Agregar opcion</button>
-      </Container> */}
-      <CardActionArea>
-        <Button onClick={handleCloseVoting}>Cerrar votacion</Button>
-        <div>
-          <p> {message} </p>
-        </div>
-      </CardActionArea>
+        <CardContent>
+          <h1>Evento</h1>
+          <h2>ID: {event.id}</h2>
+          <h2>Nombre: {event.name}</h2>
+          <h2>Disponible: {event.available ? "Sí" : "No"}</h2>
+          <h2>Fecha de Creacion: {event.created_at}</h2>
+          <h2>Fecha del Evento: {event.final_date || "Todavia no se decidio una fecha"}</h2>
+        </CardContent>
+        {/* <Container>
+          <button onClick={handleRedirect}>Agregar opcion</button>
+        </Container> */}
+        <CardActionArea>
+          {event.available ? (
+            <Button onClick={handleCloseVoting}>Cerrar votacion</Button>
+            // Para debuguear que pasa al tocar el boton
+            // <div>
+            //   <p> {message} </p>
+            // </div>
+          ) : (
+            <></>
+          ) }
+        </CardActionArea>
 
-      <CardActionArea>
-      <br></br>
-      <Button variant="contained" onClick={() => window.history.back()}>Go back</Button>
-      </CardActionArea>
+        <CardActionArea>
+          <br></br>
+          <Button variant="contained" onClick={() => window.location.href = '/events'}>Go back</Button>
+        </CardActionArea>
       </Card>
 
       

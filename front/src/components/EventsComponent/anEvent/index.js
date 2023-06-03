@@ -122,8 +122,10 @@ const handleVoteOption = async (optionId) => {
     }),
     });
     const data = await response.json();
+    console.log(data)
     if(response.status === 200) {
       data.access_token && props.setToken(data.access_token)
+      window.location.href = '/events'
     }
     if (response.status >= 400) {
       setMessage(data.message);
@@ -141,7 +143,7 @@ const handleVoteOption = async (optionId) => {
     } else {
       //pegada al endpoint con options[selectedIndex]
 
-      console.log(selectedIndex)
+      //console.log(selectedIndex)
       handleVoteOption(options[selectedIndex].id)
       //handleCloseVote()
     }
@@ -180,7 +182,7 @@ const handleVoteOption = async (optionId) => {
         <CardActions>
 
         {event.available ? <Button variant="outlined" color="primary" size="small" onClick={handleOpenModalToVote}>Votar opción</Button> : <></>}
-        {event.available && event.creator_id === localStorage.getItem('user_id') ? <Button variant="outlined" color="primary" size="small" onClick={handleOpen}>Proponer opción</Button> : <></>}
+        {event.available && event.creator.id === localStorage.getItem('user_id') ? <Button variant="outlined" color="primary" size="small" onClick={handleOpen}>Proponer opción</Button> : <></>}
         <Button variant="outlined" color="primary" size="small" onClick={handleRedirect}>Ver evento</Button>
        
         </CardActions>

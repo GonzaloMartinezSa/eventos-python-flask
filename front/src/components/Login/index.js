@@ -58,7 +58,7 @@ export default function Login(props) {
       // })
       // });
 
-      const response = await fetch(`http://localhost:5000/token`, {
+      const response = await fetch(`http://localhost:5000/users/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export default function Login(props) {
       if(response.status === 200) {
 
         props.setToken(responseData.access_token)
-        localStorage.setItem('user_id', responseData.user_id)
+        localStorage.setItem('user_id', responseData.user.id)
         
         // login successful!     
         // redirect to '/'   

@@ -3,35 +3,42 @@ version: "3.9"
 services:
   db:
     image: mongo:4.4.6
-    # para q no rompa los huevos con 1000000 logs en la terminal
-    # modificar al pasar a usar la db (o no)
     command: mongod --quiet --logpath /dev/null
     volumes:
-      - ./init-db:/docker-entrypoint-initdb.d
-      - ./data-db:/data/db
+      - tacs-mongo-data:/data/db
     env_file:
-      - ./back/.env
+      - ./back/envs/.env
     ports:
       - "27017:27017"
 
-  back:
-    build: ./back/core
-    tty: true
-    command: python3 app.py
-    env_file:
-      - ./back/.env
-    volumes:
-     - ./back/core:/code
-    ports:
-     - "5000:5000"
-    depends_on:
-     - db
-     
   front:
     build: ./front
     volumes:
-     - ./front/src:/code/src
+      - ./front/src:/code/src
     ports:
-     - "3000:3000"
+      - "3000:3000"
     depends_on:
-     - back
+      - back
+     
+
+  back:
+    build:
+      context: ./back/api
+      dockerfile: Dockerfile
+    tty: true
+    env_file:
+      - ./back/envs/.env
+    volumes:
+      - ./back/api:/code
+    command: python3 app.py
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+volumes:
+  tacs-mongo-data:
+
+
+
+  

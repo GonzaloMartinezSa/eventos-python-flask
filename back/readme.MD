@@ -71,8 +71,17 @@ $ docker compose up
 You have deployed the system, now you can navigate and start using it. At <http://localhost:5000>, there will be the following **endpoints**:
 
 
-- POST /signup
+- POST /users/signup
 
+```json
+{
+  "username": "Juan",
+  "email": "papa@gmail.com",
+  "password": "bola2345"
+}
+```
+
+- POST /users/login
 ```json
 {
   "username": "Juan",
@@ -80,19 +89,11 @@ You have deployed the system, now you can navigate and start using it. At <http:
 }
 ```
 
-- POST /login
-```json
-{
-  "username": "Juan",
-  "password": "bola2345"
-}
-```
-
-- GET /logout
+- POST /users/logout
 
 - GET /events
 
-- GET /events/:id
+- GET /events/<event_id>
 
 - POST /events
 ```json
@@ -101,19 +102,19 @@ You have deployed the system, now you can navigate and start using it. At <http:
 }
 ```
 
-- POST /events/:id/options
+- POST /events/<event_id>/options
 ```json
 {
   "datetime": "18/04/2023 11:00:20"
 }
 ```
 
-- POST /events/:id_event/options/:id_option/votes
+- POST /events/<event_id>/options/<option_id>/votes
 ```
 no body
 ```
 
-- POST /events/:id_event/close
+- POST /events/<event_id>/close
 ```
 no body
 ```
@@ -128,3 +129,4 @@ This is a university project. The code can be used :).
 &#xa0;
 
 <a href="#top">Back to top</a>
+

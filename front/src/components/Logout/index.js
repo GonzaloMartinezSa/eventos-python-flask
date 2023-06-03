@@ -8,10 +8,11 @@ export default function Logout(props) {
 
   const handleLogout = async () => {
     try{
-      const response = await fetch('http://localhost:5000/logout', {
+      const response = await fetch('http://localhost:5000/users/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + props.token
         },
       })
 
@@ -19,8 +20,8 @@ export default function Logout(props) {
       console.log(data)
 
       if(response.status === 200) {
-        //handleRedirect('/');
-        props.token()
+        handleRedirect('/login');
+        props.removeToken()
         localStorage.removeItem('user_id')
       }
     }

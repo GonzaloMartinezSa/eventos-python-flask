@@ -26,7 +26,7 @@ const Events = (props) => {
       console.log(data); // logs the nresponse
       if(response.status === 200) {
         data.access_token && props.setToken(data.access_token)
-        setEvents(data)
+        setEvents(data.events)
       }
     } catch (error) {
       console.error(error);
