@@ -19,10 +19,10 @@ export default function Logout(props) {
       const data = await response.json()
       console.log(data)
 
-      if(response.status === 200) {
-        handleRedirect('/login');
+      if(response.status === 200 || response.status === 401) {
         props.removeToken()
         localStorage.removeItem('user_id')
+        handleRedirect('/login')
       }
     }
     catch(error) {
@@ -32,7 +32,7 @@ export default function Logout(props) {
 
   useEffect(() => {
     handleLogout()
-  }, [])
+  })
 
   return ;
 

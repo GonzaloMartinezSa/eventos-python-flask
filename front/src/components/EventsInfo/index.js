@@ -1,14 +1,12 @@
-import { AppContainer, Container } from "./styles"
+import { Container } from "./styles"
 import { useState, useEffect } from "react";
-import { CardHeader, Card, CardContent, Typography} from '@mui/material';
+
 
 const EventDetail = (props) => {
   const [info, setInfo] = useState("");
 
   const handleGetEventsInfo = async () => {
     //setEventsLoading(true)
-
-    console.log('hola')
 
     try {
       const response = await fetch(`http://localhost:5000/events-info`, {
@@ -32,16 +30,27 @@ const EventDetail = (props) => {
   }
 
   useEffect(() => {
-    handleGetEventsInfo()
-  }, [])
+    if(!props.token || props.token==="" || props.token===undefined || props.token===null) {
+      // o logout?
+      console.log("Not logged in")
+      window.location.href = "/login"
+    } else {
+      handleGetEventsInfo()
+    }
+  }, [props])
 
-
-  return (
-    <Container>
-      <h1> En las ultimas 2 horas: </h1>
-      <h2>Votos: {info.votes}</h2>
-      <h2>Eventos: {info.events}</h2>
-    </Container>
-  )
+  if(!props.token || props.token==="" || props.token===undefined || props.token===null) {
+    // o logout?
+    console.log("Not logged in")
+    window.location.href = "/login"
+  } else {
+    return (
+      <Container>
+        <h1> En las ultimas 2 horas: </h1>
+        <h2>Votos: {info.votes}</h2>
+        <h2>Eventos: {info.events}</h2>
+      </Container>
+    )
+  }
 }
 export default EventDetail

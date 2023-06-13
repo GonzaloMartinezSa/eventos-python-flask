@@ -28,8 +28,8 @@ export default function Login(props) {
   });
 
   const defaultValues = {
-    email: 'demo@minimals.cc',
-    password: 'demo1234',
+    email: '',
+    password: '',
   };
 
   const methods = useForm({
@@ -46,63 +46,39 @@ export default function Login(props) {
 
   const onSubmit = async (data) => {
     try {
-      //option.preventDefault()
-      // const response = await fetch(`http://localhost:5000/login`, {
-      // method: 'POST',
-      // headers: {
-      //   'Content-Type': 'application/json',
-      // },
-      // body: JSON.stringify({ 
-      //   'username': data.email,
-      //   'password': data.password
-      // })
-      // });
-
       const response = await fetch(`http://localhost:5000/users/signin`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        'username': data.email,
-        'password': data.password
-      })
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          'username': data.email,
+          'password': data.password
+        })
       });
 
       const responseData = await response.json();
       console.log(responseData);
 
       if(response.status === 200) {
-
+        // login successful!  
         props.setToken(responseData.access_token)
         localStorage.setItem('user_id', responseData.user.id)
-        
-        // login successful!     
-        // redirect to '/'   
-        //localStorage.setItem('user', userData)
         handleRedirectToIndex()
-        
-        // const test_response = await fetch('http://localhost:5000/', {
-        //   method: 'GET',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        // });
-        // console.log(`Test logged user to API, response status: ${test_response.status}`)
-        // const test_data = await test_response.json()
-        // console.log(test_data)
-      }
-
-      if(response.status === 401) {
+      } else if(response.status === 401) {
+        // login failed!
         setLoginError(true);
-        // login failed! Incorrect username or password.
-        
+        console.error(responseData.message);
+        reset();
+        setError('afterSubmit', {
+          message: responseData.message,
+        });
       }
       else{
         document.cookie = `session=${data.session}; path=/`;
       }
 
-  } catch (error) {
+    } catch (error) {
       console.error(error);
       reset();
       setError('afterSubmit', {
@@ -164,7 +140,7 @@ export default function Login(props) {
           size="large"
           type="submit"
           variant="contained"
-          loading={isSubmitSuccessful || isSubmitting}
+          loading={(isSubmitSuccessful || isSubmitting) && !loginError}
           sx={{
             bgcolor: 'text.primary',
             color: 'common.white',
@@ -178,7 +154,6 @@ export default function Login(props) {
         >
           Login
         </LoadingButton>
-        <div>{loginError ? "error al logearse" : null}</div>
       </FormProvider>
       <Divider
         sx={{

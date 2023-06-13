@@ -1,13 +1,10 @@
-import { Container , EventContainer, AppContainer, ButtonsContainer} from "./styles"
+import { EventContainer, AppContainer} from "./styles"
 import BarChart from "./chart/index"
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { Button } from '@mui/material';
-import { CardHeader, Card, CardContent,CardActionArea, Typography} from '@mui/material';
+import { Card, CardContent,CardActionArea} from '@mui/material';
 import React from 'react';  
-import App from "../../App";
-
-
 
 
 const EventDetail = (props) => {
@@ -16,7 +13,6 @@ const EventDetail = (props) => {
   const [options, setOptions] = useState([]);
   const [message, setMessage] = useState('');
   const [optionsLoading, setOptionsLoading] = useState(false)
-
 
 
   const handleGetEvent = async () => {
@@ -44,12 +40,8 @@ const EventDetail = (props) => {
     setOptionsLoading(false)
   }
 
-  useEffect(() => {
-    handleGetEvent()
-  }, [])
-
   const handleCloseVoting = async () => {
-    if(localStorage.getItem('user_id') != event.creator.id) {
+    if(localStorage.getItem('user_id') !== event.creator.id) {
       setMessage('No sos el creador del evento, no podés cerrarlo');
       return;
     }
@@ -76,56 +68,74 @@ const EventDetail = (props) => {
     }
   }
 
-  return (
-    <AppContainer>
-      <Card sx={{ maxWidth: 345, ml:20, minWidth: 200}}>
-        <CardContent>
-          <h1>Evento</h1>
-          <h2>ID: {event.id}</h2>
-          <h2>Nombre: {event.name}</h2>
-          <h2>Disponible: {event.available ? "Sí" : "No"}</h2>
-          <h2>Fecha de Creacion: {event.created_at}</h2>
-          <h2>Fecha del Evento: {event.final_date || "Todavia no se decidio una fecha"}</h2>
-        </CardContent>
-        {/* <Container>
-          <button onClick={handleRedirect}>Agregar opcion</button>
-        </Container> */}
-        <CardActionArea>
-          {event.available ? (
-            <Button onClick={handleCloseVoting}>Cerrar votacion</Button>
-            // Para debuguear que pasa al tocar el boton
-            // <div>
-            //   <p> {message} </p>
-            // </div>
-          ) : (
-            <></>
-          ) }
-        </CardActionArea>
+  useEffect(() => {
+    if(!props.token || props.token==="" || props.token===undefined || props.token===null) {
+      // o logout?
+      console.log("Not logged in")
+      window.location.href = "/login"
+    } else {
+      handleGetEvent()
+    }
+  }, [props])
 
-        <CardActionArea>
-          <br></br>
-          <Button variant="contained" onClick={() => window.location.href = '/events'}>Go back</Button>
-        </CardActionArea>
-      </Card>
+  if(!props.token || props.token==="" || props.token===undefined || props.token===null) {
+    // o logout?
+    console.log("Not logged in")
+    window.location.href = "/login"
+  } else {
+    return (
+      <AppContainer>
+        <Card sx={{ maxWidth: 345, ml:20, minWidth: 200}}>
+          <CardContent>
+            <h1>Evento</h1>
+            <h2>ID: {event.id}</h2>
+            <h2>Nombre: {event.name}</h2>
+            <h2>Disponible: {event.available ? "Sí" : "No"}</h2>
+            <h2>Fecha de Creacion: {event.created_at}</h2>
+            <h2>Fecha del Evento: {event.final_date || "Todavia no se decidio una fecha"}</h2>
+          </CardContent>
+          {/* <Container>
+            <button onClick={handleRedirect}>Agregar opcion</button>
+          </Container> */}
+          <CardActionArea>
+            {event.available && localStorage.getItem('user_id') === event.creator.id ? (
+              <Button onClick={handleCloseVoting}>Cerrar votacion</Button>
+              // Para debuguear que pasa al tocar el boton
+              // <div>
+              //   <p> {message} </p>
+              // </div>
+            ) : (
+              <></>
+            ) }
+          </CardActionArea>
+  
+          <CardActionArea>
+            <br></br>
+            <Button variant="contained" onClick={() => window.location.href = '/events'}>Go back</Button>
+          </CardActionArea>
+        </Card>
+  
+        
+  
+        {optionsLoading ? (
+          <EventContainer>
+            <li>Cargando opciones...</li>
+          </EventContainer>
+        ) : (
+          // <div>
+          //   {
+          //     options.map((option) => (
+          //      <li> {option.datetime} </li>
+          //     ))
+          //   }
+          // </div>
+          <BarChart optionsList = {options}/>
+        )}
+        
+      </AppContainer>
+    )
+  }
 
-      
-
-      {optionsLoading ? (
-        <EventContainer>
-          <li>Cargando opciones...</li>
-        </EventContainer>
-      ) : (
-        // <div>
-        //   {
-        //     options.map((option) => (
-        //      <li> {option.datetime} </li>
-        //     ))
-        //   }
-        // </div>
-        <BarChart optionsList = {options}/>
-      )}
-      
-    </AppContainer>
-  )
 }
+
 export default EventDetail

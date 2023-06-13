@@ -3,8 +3,7 @@ import { Box, Button, Checkbox, Modal, Typography, TextField } from '@mui/materi
 import { useState, useEffect } from 'react';
 import { makeStyles } from '@mui/styles'
 import { Card, CardActions, CardContent, CardActionArea, CardMedia } from '@mui/material/';
-
-import { ButtonsContainer, Container, Option, OptionDay, OptionTime, OptionsContainer } from './styles';
+import { ButtonsContainer, Option, OptionsContainer } from './styles';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -29,19 +28,30 @@ const Event = ({ event, props }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [options, setOptions] = useState([])
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
     setOptions(event.options);
-  })
+  }, [event.options])
 
   const handleRedirect = async () => {
     window.location.href = `/events/${event.id}`
   };
   
   const handleListItemClick = (index) => {
-    setSelectedIndex(index);
+    if (selectedIndexes.includes(index)){
+      setSelectedIndexes(selectedIndexes.filter(item => item !== index));
+    }
+    else{
+      const aux = selectedIndexes.slice(); // Shallow copy
+      
+      aux.push(index); // Add a new element to the copied list
+      
+      setSelectedIndexes(aux);
+
+    }
+    console.log(selectedIndexes);
   };
 
   const handleVoteOpen = () => {
@@ -109,17 +119,18 @@ const Event = ({ event, props }) => {
     } 
 }
 
-const handleVoteOption = async (optionId) => {
+const handleVoteOption = async (optionsId) => {
   try {
-    const response = await fetch(`http://localhost:5000/events/${event.id}/options/${optionId}/votes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + props.token
-    },
-    body: JSON.stringify({
-      'voter_id': localStorage.getItem('user_id'),
-    }),
+    const response = await fetch(`http://localhost:5000/events/${event.id}/options/votes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + props.token
+      },
+      body: JSON.stringify({
+        'voter_id': localStorage.getItem('user_id'),
+        'option_ids': optionsId,
+      }),
     });
     const data = await response.json();
     console.log(data)
@@ -138,15 +149,13 @@ const handleVoteOption = async (optionId) => {
 }
 
   const handleSaveVote = () => {
-    if (selectedIndex === -1) {
-      //no se selecciono ninguna opcion
-    } else {
-      //pegada al endpoint con options[selectedIndex]
+      const aux = selectedIndexes.map(index => options[index].id)
 
+      handleVoteOption(aux)
       //console.log(selectedIndex)
-      handleVoteOption(options[selectedIndex].id)
+      
       //handleCloseVote()
-    }
+    
 
   }
 
@@ -200,10 +209,9 @@ const handleVoteOption = async (optionId) => {
             options.length &&
             <OptionsContainer>
               {options.map((option, index) => (
-                <Option>
-                  {console.log(option)}
+                <Option key={option.id} >
                    {option.datetime}
-                  <Checkbox checked={index === selectedIndex} onClick={() => handleListItemClick(index)} />
+                  <Checkbox  onChange={() => handleListItemClick(index)} />
                 </Option>
               ))}
               {message ? <text>{message}</text> : <></>}

@@ -1,6 +1,5 @@
 import { Bar } from 'react-chartjs-2';
 import { CategoryScale } from 'chart.js'; 
-import { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
 
@@ -8,6 +7,7 @@ const BarChart = ({ optionsList }) => {
   
 
   Chart.register(CategoryScale);
+
   const data =  {
     labels: optionsList.map((option) => (option.datetime)),
     datasets: [{
@@ -16,8 +16,6 @@ const BarChart = ({ optionsList }) => {
       borderWidth: 1
     }]
   };
-
-
 
   const config = {
     scales: {

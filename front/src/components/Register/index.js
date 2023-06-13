@@ -15,7 +15,7 @@ import { Container } from './styles';
 
 // ----------------------------------------------------------------------
 
-export default function Register() {
+export default function Register(props) {
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -62,14 +62,22 @@ export default function Register() {
         })
       });
 
-      const data2 = await response.json();
-      console.log(data2)
-      handleRedirect()
+      const responseData = await response.json();
+      console.log(responseData)
+      
+      if(response.status===201) {
+        handleAutoLogin(data)
+      } else if(response.status===400) {
+        console.error(responseData.message);
+        reset();
+        setError('afterSubmit', {
+          message: responseData.message,
+        });
+      }
+
     } catch (error) {
       console.error(error);
-
       reset();
-
       setError('afterSubmit', {
         ...error,
         message: error.message || error,
@@ -77,8 +85,43 @@ export default function Register() {
     }
   };
 
-  const handleRedirect = () => {
-    window.location.href = '/login'
+  const handleAutoLogin = async (data) => {
+    try {
+      const response = await fetch(`http://localhost:5000/users/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          'username': data.email,
+          'password': data.password
+        })
+      });
+
+      const responseData = await response.json();
+      console.log(responseData);
+
+      if(response.status === 200) {
+        // login successful!  
+        props.setToken(responseData.access_token)
+        localStorage.setItem('user_id', responseData.user.id)
+        window.location.href = '/'
+      }
+
+      if(response.status === 401) {
+        // login failed!
+        console.error("The signin after the signup somehow failed, even though we are using the same data used to signup...")
+      }
+
+    } catch (error) {
+      console.error(error);
+      reset();
+      setError('afterSubmit', {
+        ...error,
+        message: error.message || error,
+      });
+    }
+    // window.location.href = '/login'
   };
 
   return (

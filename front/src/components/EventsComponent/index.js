@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, EventsContainer, LoadingText } from "./styles";
 import { useEffect } from "react";
 import Event from './anEvent/index'
-import axios from 'axios'
+
 
 const Events = (props) => {
   const [eventsLoading, setEventsLoading] = useState(false)
@@ -37,26 +37,38 @@ const Events = (props) => {
   }
 
   useEffect(() => {
-    handleGetEvents()
-  }, [])
+    if(!props.token || props.token==="" || props.token===undefined || props.token===null) {
+      // o logout?
+      console.log("Not logged in")
+      window.location.href = "/login"
+    } else {
+      handleGetEvents()
+    }
+  }, [props])
 
-  return (
-    <Container>
-      {eventsLoading ? (
-        <LoadingText>Cargando eventos...</LoadingText>
-      ) : (
-        <EventsContainer>
-          {
-            events.length > 0 ?
-            events.map((event) => (
-              <Event event={event} props={props} />
-            )) :
-            <span>No hay eventos para mostrar</span>
-          }
-        </EventsContainer>
-      )}
-    </Container>
-  );
+  if(!props.token || props.token==="" || props.token===undefined || props.token===null) {
+    // o logout?
+    console.log("Not logged in")
+    window.location.href = "/login"
+  } else {
+    return (
+      <Container>
+        {eventsLoading ? (
+          <LoadingText>Cargando eventos...</LoadingText>
+        ) : (
+          <EventsContainer>
+            {
+              events.length > 0 ?
+              events.map((event) => (
+                <Event key={event.id} event={event} props={props} />
+              )) :
+              <span>No hay eventos para mostrar</span>
+            }
+          </EventsContainer>
+        )}
+      </Container>
+    );
+  }
 };
 
 export default Events;
