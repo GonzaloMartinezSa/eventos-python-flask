@@ -13,6 +13,11 @@ class Vote(Document):
             "timestamp": str(self.timestamp),
         }
 
+    def voted_in_the_last_2_hours(self) -> bool:
+        now = datetime.now()
+        hour_diff = round((now - self.timestamp).total_seconds() / 3600, 2)
+        return hour_diff <= 2
+
 
 class EventOption(Document):
 
@@ -37,6 +42,9 @@ class EventOption(Document):
             "datetime": str(self.timestamp),
             "votes": self.total_votes(),
         }
+
+    def voted_in_the_last_2_hours(self) -> int:
+        return len([vote for vote in self.votes if vote.voted_in_the_last_2_hours()])
 
 
 class Event(Document):
@@ -72,11 +80,13 @@ class Event(Document):
         self.final_date = winner.timestamp
         self.save()
 
+    def options_voted_in_the_last_2_hours(self) -> list:
+        return [option for option in self.options if option.voted_in_the_last_2_hours]
+
     def created_in_the_last_2_hours(self):
-        now = datetime.datetime.now()
+        now = datetime.now()
         hour_diff = round((now - self.created_at).total_seconds() / 3600, 2)
         return hour_diff <= 2
-    
 
     def to_json(self):
         option_json = list(map(lambda option: option.to_json(), self.options))

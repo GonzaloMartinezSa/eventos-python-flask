@@ -4,24 +4,30 @@ from app import app
 from users.models import User
 import uuid
 
+
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
-    
+
     try:
         user = User(username="testuser", password="password")
         user.save()
-    except:
+    except Exception as e:
+        print('Got this exception:')
+        print(e)
         pass
+
+
+username = 'testuser_' + str(uuid.uuid4())
+
 
 def test_user_signup(client):
     # Test user signup endpoint
-    username = 'testuser_' + str(uuid.uuid4())
-    
+
     payload = {
-        'username': username ,
+        'username': username,
         'email': username + '@example.com',
         'password': 'password'
     }
@@ -38,7 +44,7 @@ def test_user_signup(client):
 def test_user_signin(client):
     # Test user signin endpoint
     payload = {
-        'username': 'testuser',
+        'username': username,
         'password': 'password'
     }
     response = client.post('/users/signin', json=payload)
@@ -60,7 +66,7 @@ def test_user_logout(client):
 def get_access_token(client):
     # Helper function to get the access token
     payload = {
-        'username': 'testuser',
+        'username': username,
         'password': 'password'
     }
     response = client.post('/users/signin', json=payload)

@@ -5,6 +5,7 @@ from events.models import Event, EventOption, ClosedEventException
 from users.models import User
 from flask_jwt_extended import create_access_token
 
+
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
@@ -16,16 +17,17 @@ def client():
 def create_event():
     # Try to get user
     event = Event.objects(name='Test Event').first()
-    if(not event):
+    if not event:
         event = Event(name='Test Event')
         event.save()
     return event
+
 
 @pytest.fixture
 def create_user():
     # Try to get user
     user = User.objects(username='johndoe').first()
-    if(not user):
+    if not user:
         user = User(username='johndoe', email='johndoe@example.com', password='password')
         user.save()
     return user
@@ -43,6 +45,7 @@ def test_get_events(client, create_event, create_user):
     assert 'events' in data
     assert isinstance(data['events'], list)
 
+
 def test_delete_event(client, create_event, create_user):
     event_id = str(create_event.id)
     response = client.delete(f'/events/{event_id}')
@@ -55,6 +58,7 @@ def test_delete_event(client, create_event, create_user):
     data = json.loads(response.data)
     assert 'message' in data
     assert data['message'] == 'Event deleted'
+
 
 def test_create_event(client, create_user):
     with app.app_context():
@@ -73,12 +77,13 @@ def test_add_option(client, create_event, create_user):
         event_id = str(create_event.id)
         user_token = create_access_token(identity=create_user.username)
         headers = {'Authorization': f'Bearer {user_token}'}
-        data = {'datetime': '2023-05-30 15:28:22'}
+        data = {'datetime': '2023-05-30T15:28:22'}
         response = client.post(f'/events/{event_id}/options', headers=headers, json=data)
         assert response.status_code == 201
         data = json.loads(response.data)
         assert 'message' in data
         assert data['message'] == 'Option added successfully'
+
 
 def test_close_event(client, create_event, create_user):
     with app.app_context():
@@ -101,7 +106,8 @@ def test_count_recent_events(client, create_user):
         data = json.loads(response.data)
         assert 'events' in data
         assert 'votes' in data
-        
+
+
 '''
 def test_vote_option(client, create_event, create_user):
     with app.app_context():

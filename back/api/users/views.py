@@ -6,10 +6,12 @@ from flask_jwt_extended import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import app
 from users.models import User
+from rate_limiter import limit
 import datetime
 
 # User sign up
 @app.route('/users/signup', methods=['POST'])
+@limit("10/minute")
 def sign_up():
     data = request.json
     username = data.get('username', None)

@@ -13,7 +13,6 @@ MONGO_DB = os.environ.get('MONGO_INITDB_DATABASE')
 MONGO_USERNAME = os.environ.get('MONGO_INITDB_ROOT_USERNAME')
 MONGO_PASSWORD = os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
 
-
 # Configure Flask JWT Extended
 app.config['JWT_SECRET_KEY'] = 'super-secret'
 jwt = JWTManager(app)
@@ -27,7 +26,6 @@ connect(
     password=MONGO_PASSWORD,
 )
 
-
 from routes import *
 
 if __name__ == "__main__":
@@ -37,5 +35,5 @@ if __name__ == "__main__":
     PORT = int(os.environ.get("FLASK_PORT", 5000))
     HOST = os.environ.get("FLASK_HOST", '0.0.0.0')
     DEBUG = bool(int(os.environ.get("DEBUG", 0)))
-    
+
     app.run(host=HOST, port=PORT, debug=DEBUG)

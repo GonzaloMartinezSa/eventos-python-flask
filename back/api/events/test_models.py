@@ -1,8 +1,7 @@
 import pytest
-from datetime import datetime, timedelta
+from events.models import Event, EventOption
 from mongoengine import connect
 from users.models import User
-from events.models import Event, EventOption, Vote, ClosedEventException, OptionNotFoundException, CannotVoteTwiceException
 
 
 @pytest.fixture
@@ -15,7 +14,7 @@ def setup_database():
 def create_user():
     # Try to get user
     user = User.objects(username='johndoe').first()
-    if(not user):
+    if not user:
         user = User(username='johndoe', email='johndoe@example.com', password='password')
         user.save()
     return user
