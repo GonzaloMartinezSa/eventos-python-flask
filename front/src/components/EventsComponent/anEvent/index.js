@@ -5,6 +5,8 @@ import { makeStyles } from '@mui/styles'
 import { Card, CardActions, CardContent, CardActionArea, CardMedia } from '@mui/material/';
 import { ButtonsContainer, Option, OptionsContainer } from './styles';
 
+import {BACKEND as backend_api} from '../../../config/config'
+
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -51,7 +53,7 @@ const Event = ({ event, props }) => {
       setSelectedIndexes(aux);
 
     }
-    console.log(selectedIndexes);
+    //console.log(selectedIndexes);
   };
 
   const handleVoteOpen = () => {
@@ -80,7 +82,7 @@ const Event = ({ event, props }) => {
 
   const handleSave = () => {
     if (selectedDate && selectedTime) {
-      console.log(`Fecha seleccionada: ${selectedDate}. Hora seleccionada: ${selectedTime}.`);
+      //console.log(`Fecha seleccionada: ${selectedDate}. Hora seleccionada: ${selectedTime}.`);
       const date = new Date(selectedDate)
       const year = date.getFullYear();
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -98,7 +100,7 @@ const Event = ({ event, props }) => {
 
   const handleSubmit = async (formattedDate, selectedTime) => {
     try {
-        const response = await fetch(`http://localhost:5000/events/${event.id}/options`, {
+        const response = await fetch(`${backend_api}/events/${event.id}/options`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,9 +109,14 @@ const Event = ({ event, props }) => {
         body: JSON.stringify({ 'datetime': formattedDate + "T" + selectedTime })
         });
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         if(response.status === 201) {
           data.access_token && props.setToken(data.access_token)
+        }
+        if(response.status === 429) {
+          // too many requests
+          // por ahora dejo algo asi, profesionalmente se podria hacer algo mejor (?)
+          window.location.href = "/tooManyRequests"
         }
         // Tengo que redirigir para que vuelva a hacer el GET de eventos 
         // (actualizar las opciones). Seguro Diego sabe hacerlo mejor, pero bue
@@ -121,7 +128,7 @@ const Event = ({ event, props }) => {
 
 const handleVoteOption = async (optionsId) => {
   try {
-    const response = await fetch(`http://localhost:5000/events/${event.id}/options/votes`, {
+    const response = await fetch(`${backend_api}/events/${event.id}/options/votes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -133,10 +140,15 @@ const handleVoteOption = async (optionsId) => {
       }),
     });
     const data = await response.json();
-    console.log(data)
+    //console.log(data)
     if(response.status === 200) {
       data.access_token && props.setToken(data.access_token)
       window.location.href = '/events'
+    }
+    if(response.status === 429) {
+      // too many requests
+      // por ahora dejo algo asi, profesionalmente se podria hacer algo mejor (?)
+      window.location.href = "/tooManyRequests"
     }
     if (response.status >= 400) {
       setMessage(data.message);
@@ -160,7 +172,7 @@ const handleVoteOption = async (optionsId) => {
   }
 
   const handleOpenModalToVote = () => {
-    console.log(`Length de 'options' es: ${options.length}`)
+    //console.log(`Length de 'options' es: ${options.length}`)
     if (options.length > 0) {
       handleVoteOpen()
     }

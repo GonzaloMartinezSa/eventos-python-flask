@@ -2,6 +2,7 @@ from flask import Flask
 from mongoengine import connect
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from cleaner import start_cleaner
 import os
 
 app = Flask(__name__)
@@ -36,4 +37,6 @@ if __name__ == "__main__":
     HOST = os.environ.get("FLASK_HOST", '0.0.0.0')
     DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
+    start_cleaner()
+    
     app.run(host=HOST, port=PORT, debug=DEBUG)

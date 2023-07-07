@@ -1,5 +1,8 @@
-import { Container } from "./styles"
+import { Card, Typography, CardContent } from "@mui/material"
 import { useState, useEffect } from "react";
+
+import {BACKEND as backend_api} from '../../config/config'
+import { AppContainer } from "./styles";
 
 
 const EventDetail = (props) => {
@@ -9,7 +12,7 @@ const EventDetail = (props) => {
     //setEventsLoading(true)
 
     try {
-      const response = await fetch(`http://localhost:5000/events-info`, {
+      const response = await fetch(`${backend_api}/events-info`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -17,10 +20,15 @@ const EventDetail = (props) => {
         },
       });
       const data = await response.json();
-      console.log(data); // logs response
+      //console.log(data); // logs response
       if(response.status === 200) {
         data.access_token && props.setToken(data.access_token)
         setInfo(data)
+      }
+      if(response.status === 429) {
+        // too many requests
+        // por ahora dejo algo asi, profesionalmente se podria hacer algo mejor (?)
+        window.location.href = "/tooManyRequests"
       }
     } catch (error) {
       console.error(error);
@@ -45,11 +53,18 @@ const EventDetail = (props) => {
     window.location.href = "/login"
   } else {
     return (
-      <Container>
-        <h1> En las ultimas 2 horas: </h1>
-        <h2>Votos: {info.votes}</h2>
-        <h2>Eventos: {info.events}</h2>
-      </Container>
+      <AppContainer>
+        <Card sx={{ width: 500 }}>
+          <CardContent>
+            <Typography variant='h4'>En las últimas 2 horas:</Typography>
+            <Typography variant='h5'>Eventos: {info.events}</Typography>
+            <Typography variant='h5'>Votos: {info.votes}</Typography>
+            {info.votes_info && info.votes_info.map((vote) => (
+              <Typography>• {vote}</Typography>
+            ))}
+          </CardContent>
+        </Card>
+      </AppContainer>
     )
   }
 }

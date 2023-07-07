@@ -3,6 +3,8 @@ import { Container, EventsContainer, LoadingText } from "./styles";
 import { useEffect } from "react";
 import Event from './anEvent/index'
 
+import {BACKEND as backend_api} from '../../config/config'
+
 
 const Events = (props) => {
   const [eventsLoading, setEventsLoading] = useState(false)
@@ -11,10 +13,8 @@ const Events = (props) => {
   const handleGetEvents = async () => {
     setEventsLoading(true)
 
-    console.log(props.token)
-
     try {
-      const response = await fetch('http://localhost:5000/events', {
+      const response = await fetch(`${backend_api}/events`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -23,7 +23,12 @@ const Events = (props) => {
       });
 
       const data = await response.json();
-      console.log(data); // logs the nresponse
+      if(response.status === 429) {
+        // too many requests
+        // por ahora dejo algo asi, profesionalmente se podria hacer algo mejor (?)
+        window.location.href = "/tooManyRequests"
+      }
+      //console.log(data); // logs the response
       if(response.status === 200) {
         data.access_token && props.setToken(data.access_token)
         setEvents(data.events)

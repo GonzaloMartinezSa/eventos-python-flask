@@ -10,12 +10,15 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Logout from "./components/Logout/index";
 import NotFound from "./components/NotFound/index"
+import TooManyRequests from "./components/TooManyRequests/index"
 
 import useToken from './components/Token/useToken'
 
 function App() {
 
   const { token, removeToken, setToken } = useToken();
+
+  document.title = 'Last Supper'
 
   return (
     <Container>
@@ -34,6 +37,7 @@ function App() {
           <Route path="/events/:id" element={<EventDetail token={token} setToken={setToken} />} />
           <Route path="/events-info" element={<EventsInfo token={token} setToken={setToken}/>} />
           {/* Esta tiene que ser la ultima ruta si o si */}
+          <Route path="/tooManyRequests" element={<TooManyRequests/>}/>
           <Route path="*" element={<NotFound/>} />
         </Routes>
       </BrowserRouter>

@@ -1,8 +1,7 @@
 from functools import wraps
 from flask import request, jsonify
 from mongoengine import Document, DateTimeField, StringField
-from datetime import datetime
-
+from datetime import datetime, timedelta
 
 class Measurement(Document):
     method = StringField(required=True)
@@ -20,11 +19,11 @@ def limit(param: str = "20/minute"):
             print("For url path:", request.path)
             print("With HTTP method:", request.method)
 
-            # param                                      # '10/minute', '10/hour, '10/day'
-            rate_value = int(param.split('/')[0])  # '10'
-            rate_unit = param.split('/')[1]  # 'minute'
-            path = request.path  # '/events'
-            method = request.method  # 'GET'
+            # param                                     # '10/minute', '10/hour, '10/day'
+            rate_value = int(param.split('/')[0])       # '10'
+            rate_unit = param.split('/')[1]             # 'minute'
+            path = request.path                         # '/events'
+            method = request.method                     # 'GET'
 
             # interpreto el rango de tiempo a limitar
             current_time = datetime.now()
@@ -59,7 +58,7 @@ def limit(param: str = "20/minute"):
                 # Call the route function
                 result = route_func(*args, **kwargs)
             else:
-                result = jsonify({'message': 'Exedeed the rate limit for this resource.'}), 429
+                result = jsonify({'message': 'Excedeed the rate limit for this resource.'}), 429
 
             # Code to execute after the route function is called
             # (if needed)

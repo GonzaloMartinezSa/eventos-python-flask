@@ -13,6 +13,8 @@ import { Container } from './styles';
 import RHFTextField from '../utils/auth/RHFTextField';
 import { useLocation } from 'react-router-dom';
 
+import {BACKEND as backend_api} from '../../config/config'
+
 // ----------------------------------------------------------------------
 
 export default function Login(props) {
@@ -46,7 +48,7 @@ export default function Login(props) {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(`http://localhost:5000/users/signin`, {
+      const response = await fetch(`${backend_api}/users/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +60,7 @@ export default function Login(props) {
       });
 
       const responseData = await response.json();
-      console.log(responseData);
+      //console.log(responseData);
 
       if(response.status === 200) {
         // login successful!  

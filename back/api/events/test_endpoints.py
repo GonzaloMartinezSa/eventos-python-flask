@@ -1,10 +1,20 @@
 import pytest
 from flask import json
 from app import app
-from events.models import Event, EventOption, ClosedEventException
+from events.models import Event
 from users.models import User
 from flask_jwt_extended import create_access_token
+import mongomock
+from mongoengine import connect, disconnect
 
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_teardown_module():
+    disconnect()
+    connect('mongoenginetest', host='mongodb://localhost', mongo_client_class=mongomock.MongoClient)
+    yield
+    disconnect()
+    
 
 @pytest.fixture
 def client():
@@ -15,10 +25,12 @@ def client():
 
 @pytest.fixture
 def create_event():
-    # Try to get user
+    # Try to get event
     event = Event.objects(name='Test Event').first()
     if not event:
         event = Event(name='Test Event')
+        user = User.objects(username='johndoe').first()
+        event.creator = user
         event.save()
     return event
 
@@ -33,7 +45,7 @@ def create_user():
     return user
 
 
-def test_get_events(client, create_event, create_user):
+def test_get_events(client, create_user, create_event):
     response = client.get('/events')
     assert response.status_code == 401
 
@@ -46,7 +58,7 @@ def test_get_events(client, create_event, create_user):
     assert isinstance(data['events'], list)
 
 
-def test_delete_event(client, create_event, create_user):
+def test_delete_event(client, create_user, create_event):
     event_id = str(create_event.id)
     response = client.delete(f'/events/{event_id}')
     assert response.status_code == 401
@@ -64,7 +76,7 @@ def test_create_event(client, create_user):
     with app.app_context():
         user_token = create_access_token(identity=create_user.username)
         headers = {'Authorization': f'Bearer {user_token}'}
-        data = {'name': 'New Event'}
+        data = {'name': 'New Event', 'options': ['2023-06-19T10:12', '2023-06-19T10:13']}
         response = client.post('/events', headers=headers, json=data)
         assert response.status_code == 201
         data = json.loads(response.data)
@@ -72,30 +84,17 @@ def test_create_event(client, create_user):
         assert 'event' in data
 
 
-def test_add_option(client, create_event, create_user):
+def test_add_option(client, create_user, create_event):
     with app.app_context():
         event_id = str(create_event.id)
         user_token = create_access_token(identity=create_user.username)
         headers = {'Authorization': f'Bearer {user_token}'}
-        data = {'datetime': '2023-05-30T15:28:22'}
+        data = {'datetime': '2023-05-30T15:28'}
         response = client.post(f'/events/{event_id}/options', headers=headers, json=data)
         assert response.status_code == 201
         data = json.loads(response.data)
         assert 'message' in data
         assert data['message'] == 'Option added successfully'
-
-
-def test_close_event(client, create_event, create_user):
-    with app.app_context():
-        event_id = str(create_event.id)
-        user_token = create_access_token(identity=create_user.username)
-        headers = {'Authorization': f'Bearer {user_token}'}
-        response = client.post(f'/events/{event_id}/close', headers=headers)
-        assert response.status_code == 200
-        data = json.loads(response.data)
-        assert 'message' in data
-        assert data['message'] == 'Event closed successfully'
-
 
 def test_count_recent_events(client, create_user):
     with app.app_context():

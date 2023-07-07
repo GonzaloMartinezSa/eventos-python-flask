@@ -3,8 +3,10 @@ import BarChart from "./chart/index"
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { Button } from '@mui/material';
-import { Card, CardContent,CardActionArea} from '@mui/material';
+import { Card, CardContent, CardActionArea } from '@mui/material';
 import React from 'react';  
+
+import {BACKEND as backend_api} from '../../config/config'
 
 
 const EventDetail = (props) => {
@@ -19,7 +21,7 @@ const EventDetail = (props) => {
     setOptionsLoading(true)
 
     try {
-      const response = await fetch(`http://localhost:5000/events/${id}`, {
+      const response = await fetch(`${backend_api}/events/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +29,12 @@ const EventDetail = (props) => {
         },
       });
       const data = await response.json();
-      console.log(data); // logs the response
+      if(response.status === 429) {
+        // too many requests
+        // por ahora dejo algo asi, profesionalmente se podria hacer algo mejor (?)
+        window.location.href = "/tooManyRequests"
+      }
+      //console.log(data); // logs the response
       if(response.status === 200) {
         data.access_token && props.setToken(data.access_token)
         setEvent(data)
@@ -46,7 +53,7 @@ const EventDetail = (props) => {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:5000/events/${id}/close`, {
+      const response = await fetch(`${backend_api}/events/${id}/close`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,10 +65,15 @@ const EventDetail = (props) => {
         data.access_token && props.setToken(data.access_token)
         window.location.reload()
       }
+      if(response.status === 429) {
+        // too many requests
+        // por ahora dejo algo asi, profesionalmente se podria hacer algo mejor (?)
+        window.location.href = "/tooManyRequests"
+      }
       response.status===200 
         ? setMessage('Votacion cerrada correctamente') 
         : setMessage('Fallo el Backend')
-      console.log(data); // logs response's body
+      //console.log(data); // logs response's body
     } catch (error) {
       setMessage('Fallo la conexion al Backend')
       console.error(error);
@@ -85,7 +97,7 @@ const EventDetail = (props) => {
   } else {
     return (
       <AppContainer>
-        <Card sx={{ maxWidth: 345, ml:20, minWidth: 200}}>
+        <Card sx={{ maxWidth: 'auto', ml:20, minWidth: 200 }}>
           <CardContent>
             <h1>Evento</h1>
             <h2>ID: {event.id}</h2>
@@ -94,9 +106,6 @@ const EventDetail = (props) => {
             <h2>Fecha de Creacion: {event.created_at}</h2>
             <h2>Fecha del Evento: {event.final_date || "Todavia no se decidio una fecha"}</h2>
           </CardContent>
-          {/* <Container>
-            <button onClick={handleRedirect}>Agregar opcion</button>
-          </Container> */}
           <CardActionArea>
             {event.available && localStorage.getItem('user_id') === event.creator.id ? (
               <Button onClick={handleCloseVoting}>Cerrar votacion</Button>
@@ -108,29 +117,21 @@ const EventDetail = (props) => {
               <></>
             ) }
           </CardActionArea>
-  
-          <CardActionArea>
-            <br></br>
-            <Button variant="contained" onClick={() => window.location.href = '/events'}>Go back</Button>
-          </CardActionArea>
+
+            <Button variant="contained" onClick={() => window.location.href = '/events'}>Volver</Button>
+
+          {optionsLoading ? (
+            <EventContainer>
+              <li>Cargando opciones...</li>
+            </EventContainer>
+          ) : (
+            <BarChart optionsList = {options}/>
+          )}
         </Card>
   
         
   
-        {optionsLoading ? (
-          <EventContainer>
-            <li>Cargando opciones...</li>
-          </EventContainer>
-        ) : (
-          // <div>
-          //   {
-          //     options.map((option) => (
-          //      <li> {option.datetime} </li>
-          //     ))
-          //   }
-          // </div>
-          <BarChart optionsList = {options}/>
-        )}
+        
         
       </AppContainer>
     )

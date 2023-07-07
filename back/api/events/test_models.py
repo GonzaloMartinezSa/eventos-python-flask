@@ -2,14 +2,18 @@ import pytest
 from events.models import Event, EventOption
 from mongoengine import connect
 from users.models import User
+import mongomock
+from mongoengine import connect, disconnect
 
 
-@pytest.fixture
-def setup_database():
-    # Connect to a test database
-    connect('testdb', host='mongomock://localhost')
-
-
+@pytest.fixture(scope="function", autouse=True)
+def setup_teardown_module():
+    disconnect()
+    connect('mongoenginetest', host='mongodb://localhost', mongo_client_class=mongomock.MongoClient)
+    yield
+    disconnect()
+    
+    
 @pytest.fixture
 def create_user():
     # Try to get user

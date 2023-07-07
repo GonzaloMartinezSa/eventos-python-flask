@@ -13,10 +13,10 @@ class Vote(Document):
             "timestamp": str(self.timestamp),
         }
 
-    def voted_in_the_last_2_hours(self) -> bool:
-        now = datetime.now()
-        hour_diff = round((now - self.timestamp).total_seconds() / 3600, 2)
-        return hour_diff <= 2
+    # def voted_in_the_last_2_hours(self) -> bool:
+    #     now = datetime.now()
+    #     hour_diff = round((now - self.timestamp).total_seconds() / 3600, 2)
+    #     return hour_diff <= 2
 
 
 class EventOption(Document):
@@ -43,8 +43,8 @@ class EventOption(Document):
             "votes": self.total_votes(),
         }
 
-    def voted_in_the_last_2_hours(self) -> int:
-        return len([vote for vote in self.votes if vote.voted_in_the_last_2_hours()])
+    # def voted_in_the_last_2_hours(self) -> int:
+    #     return len([vote for vote in self.votes if vote.voted_in_the_last_2_hours()])
 
 
 class Event(Document):
@@ -80,14 +80,43 @@ class Event(Document):
         self.final_date = winner.timestamp
         self.save()
 
-    def options_voted_in_the_last_2_hours(self) -> list:
-        return [option for option in self.options if option.voted_in_the_last_2_hours]
+    # def options_voted_in_the_last_2_hours(self) -> list:
+    #     return [option for option in self.options if option.voted_in_the_last_2_hours]
 
-    def created_in_the_last_2_hours(self):
-        now = datetime.now()
-        hour_diff = round((now - self.created_at).total_seconds() / 3600, 2)
-        return hour_diff <= 2
+    # def created_in_the_last_2_hours(self):
+    #     now = datetime.now()
+    #     hour_diff = round((now - self.created_at).total_seconds() / 3600, 2)
+    #     return hour_diff <= 2
+    
+    def to_json_voted(self, user):
+        
+        voted_json = list()
+        available_json = list()
+        
+        for option in self.options:
+            voted = False
+            for vote in option.votes:
+                if(vote.voter == user):
+                    voted = True
+                    # Add to voted list
+                    voted_json.append(option.to_json())
+                    break
+            if(not voted):
+                # Add to not available lit
+                available_json.append(option.to_json())
 
+        return {
+            'id': str(self.id),
+            'name': self.name,
+            'available': self.available,
+            'created_at': self.created_at,
+            'final_date': self.final_date,
+            'options_available': available_json,
+            'options_voted': voted_json,
+            'creator': self.creator.to_json(),
+        }
+        
+        
     def to_json(self):
         option_json = list(map(lambda option: option.to_json(), self.options))
         

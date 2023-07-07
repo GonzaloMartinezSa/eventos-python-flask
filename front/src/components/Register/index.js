@@ -11,7 +11,8 @@ import FormProvider from '../utils/auth/FormProvider';
 import RHFTextField from '../utils/auth/RHFTextField';
 import Iconify from '../utils/iconify/Iconify';
 import { Container } from './styles';
-// components
+
+import {BACKEND as backend_api} from '../../config/config'
 
 // ----------------------------------------------------------------------
 
@@ -48,9 +49,9 @@ export default function Register(props) {
   const onSubmit = async (data) => {
     try {
 
-      console.log(data.email, data.password);
+      //console.log(data.email, data.password);
 
-      const response = await fetch(`http://localhost:5000/users/signup`, {
+      const response = await fetch(`${backend_api}/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ export default function Register(props) {
       });
 
       const responseData = await response.json();
-      console.log(responseData)
+      //console.log(responseData)
       
       if(response.status===201) {
         handleAutoLogin(data)
@@ -87,7 +88,7 @@ export default function Register(props) {
 
   const handleAutoLogin = async (data) => {
     try {
-      const response = await fetch(`http://localhost:5000/users/signin`, {
+      const response = await fetch(`${backend_api}/users/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +100,7 @@ export default function Register(props) {
       });
 
       const responseData = await response.json();
-      console.log(responseData);
+      //console.log(responseData);
 
       if(response.status === 200) {
         // login successful!  

@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app import app
 from users.models import User
 from rate_limiter import limit
+from blacklist import add_to_blacklist
 import datetime
 
 # User sign up
@@ -54,6 +55,10 @@ def sign_in():
 # User log out
 @app.route('/users/logout', methods=['POST'])
 @jwt_required()
+@add_to_blacklist()
 def log_out():
     # Implement any necessary log out logic
+
+    print(request.headers)
+
     return jsonify({'message': 'Logged out successfully'}), 200

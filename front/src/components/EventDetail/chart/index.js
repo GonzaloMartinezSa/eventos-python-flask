@@ -11,7 +11,7 @@ const BarChart = ({ optionsList }) => {
   const data =  {
     labels: optionsList.map((option) => (option.datetime)),
     datasets: [{
-      label: '# of Votes',
+      label: '# de votos',
       data: optionsList.map((option) => (option.votes)),
       borderWidth: 1
     }]
